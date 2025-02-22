@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, TextInput, ScrollView, TouchableOpacity, Alert 
 import { useState } from 'react';
 import { router } from 'expo-router';
 import RNPickerSelect from 'react-native-picker-select';
+import { usePatientStore } from './store/patientData';
 
 interface PatientInfo {
   name: string;
@@ -11,6 +12,7 @@ interface PatientInfo {
   idNumber: string;
   height: string;  // in cm
   weight: string;  // in kg
+  age: number | null;
 }
 
 // Generate height options (140cm to 200cm)
@@ -25,7 +27,23 @@ const weightOptions = Array.from(
   (_, i) => ({ label: `${30 + i} 公斤`, value: (30 + i).toString() })
 );
 
+// Add this function at the top level
+const calculateAge = (year: string, month: string, day: string): number => {
+  const birthYear = parseInt(year);
+  const birthMonth = parseInt(month);
+  const birthDay = parseInt(day);
+  const today = new Date();
+  let age = today.getFullYear() - birthYear;
+  const m = today.getMonth() + 1 - birthMonth;
+  if (m < 0 || (m === 0 && today.getDate() < birthDay)) {
+    age--;
+  }
+  return age;
+};
+
 export default function PatientInfo() {
+  const { updatePatientInfo } = usePatientStore();
+  
   // Get current year
   const currentYear = new Date().getFullYear();
   
@@ -37,6 +55,7 @@ export default function PatientInfo() {
     idNumber: '',
     height: '',
     weight: '',
+    age: null,
   });
 
   // Generate year options from 1912 to current year
@@ -84,19 +103,73 @@ export default function PatientInfo() {
   const bmi = calculateBMI();
   const isObese = bmi ? bmi >= 30 : false;  // WHO definition of obesity
 
+  const validateFields = () => {
+    const errors = [];
+    
+    if (!patientInfo.name) errors.push('姓名');
+    if (!patientInfo.idNumber) errors.push('身分證字號');
+    if (!patientInfo.height) errors.push('身高');
+    if (!patientInfo.weight) errors.push('體重');
+    
+    if (errors.length > 0) {
+      Alert.alert('請填寫以下必填項目', errors.join('、'));
+      return false;
+    }
+    
+    return true;
+  };
+
   const handleSubmit = () => {
-    if (!patientInfo.height || !patientInfo.weight) {
+    if (!validateFields()) return;
+    
+    const height = parseFloat(patientInfo.height);
+    const weight = parseFloat(patientInfo.weight);
+    
+    if (!height || !weight) {
       Alert.alert('請輸入身高體重');
       return;
     }
     
-    const bmi = calculateBMI();
-    if (bmi === null) {
-      Alert.alert('身高體重數值有誤');
-      return;
-    }
+    const heightInMeters = height / 100;
+    const bmi = weight / (heightInMeters * heightInMeters);
+    const isObese = bmi >= 30;
+    
+    const age = calculateAge(
+      patientInfo.birthYear,
+      patientInfo.birthMonth,
+      patientInfo.birthDay
+    );
+
+    updatePatientInfo({
+      name: patientInfo.name,
+      birthYear: patientInfo.birthYear,
+      birthMonth: patientInfo.birthMonth,
+      birthDay: patientInfo.birthDay,
+      idNumber: patientInfo.idNumber,
+      age: age,
+      height: patientInfo.height,
+      weight: patientInfo.weight,
+      bmi: bmi,
+      isObese: isObese,
+    });
 
     router.push('/medical-history');
+  };
+
+  // Update the birth date handlers
+  const handleBirthYearChange = (value: string) => {
+    const age = calculateAge(value, patientInfo.birthMonth, patientInfo.birthDay);
+    setPatientInfo({ ...patientInfo, birthYear: value, age });
+  };
+
+  const handleBirthMonthChange = (value: string) => {
+    const age = calculateAge(patientInfo.birthYear, value, patientInfo.birthDay);
+    setPatientInfo({ ...patientInfo, birthMonth: value, age });
+  };
+
+  const handleBirthDayChange = (value: string) => {
+    const age = calculateAge(patientInfo.birthYear, patientInfo.birthMonth, value);
+    setPatientInfo({ ...patientInfo, birthDay: value, age });
   };
 
   return (
@@ -148,10 +221,7 @@ export default function PatientInfo() {
           {showYearPicker && (
             <RNPickerSelect
               value={patientInfo.birthYear}
-              onValueChange={(value) => {
-                setPatientInfo({ ...patientInfo, birthYear: value });
-                setShowYearPicker(false);
-              }}
+              onValueChange={handleBirthYearChange}
               items={yearOptions}
               style={pickerSelectStyles}
             />
@@ -160,10 +230,7 @@ export default function PatientInfo() {
           {showMonthPicker && (
             <RNPickerSelect
               value={patientInfo.birthMonth}
-              onValueChange={(value) => {
-                setPatientInfo({ ...patientInfo, birthMonth: value });
-                setShowMonthPicker(false);
-              }}
+              onValueChange={handleBirthMonthChange}
               items={monthOptions}
               style={pickerSelectStyles}
             />
@@ -172,10 +239,7 @@ export default function PatientInfo() {
           {showDayPicker && (
             <RNPickerSelect
               value={patientInfo.birthDay}
-              onValueChange={(value) => {
-                setPatientInfo({ ...patientInfo, birthDay: value });
-                setShowDayPicker(false);
-              }}
+              onValueChange={handleBirthDayChange}
               items={dayOptions}
               style={pickerSelectStyles}
             />

@@ -91,14 +91,6 @@ export default function MedicalHistory() {
         <Text style={styles.title}>病史資料</Text>
 
         <View style={styles.form}>
-          {/* Calculated Age */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>年齡</Text>
-            <Text style={styles.calculatedAge}>
-              {calculateAge(patientData.birthYear, patientData.birthMonth, patientData.birthDay)}歲
-            </Text>
-          </View>
-
           {/* Gender Selection */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>生理性別</Text>

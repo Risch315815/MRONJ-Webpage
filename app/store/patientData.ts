@@ -41,6 +41,7 @@ export interface PatientData {
   birthMonth: string;
   birthDay: string;
   idNumber: string;
+  age: number | null;
   
   // Medical History
   gender: '男' | '女' | '跨性別' | '';
@@ -87,6 +88,7 @@ const initialState: PatientData = {
   birthMonth: '1',
   birthDay: '1',
   idNumber: '',
+  age: null,
   gender: '',
   transgenderType: '',
   hasHormoneTherapy: false,

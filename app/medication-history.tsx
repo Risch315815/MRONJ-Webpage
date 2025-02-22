@@ -1,12 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
 import RNPickerSelect from 'react-native-picker-select';
-import { usePatientStore } from './store/patientData';
+import { usePatientStore, DrugName } from './store/patientData';
+
+// Add interface for medication
+interface Medication {
+  name: DrugName;
+  route: '口服' | '注射';
+}
+
+interface MedicationGroup {
+  title: string;
+  medications: Medication[];
+}
 
 export default function MedicationHistory() {
   const { patientData, updatePatientInfo } = usePatientStore();
   const [dateError, setDateError] = useState<string>('');
+
+  // Set default value for hasAntiresorptiveMed to true when component mounts
+  useEffect(() => {
+    if (patientData.hasAntiresorptiveMed === false) {
+      updatePatientInfo({
+        hasAntiresorptiveMed: true,
+        medicationType: '',
+        medicationSubType: '',
+        drugName: '',
+        administrationRoute: '',
+        indication: '',
+        startYear: '',
+        startMonth: '',
+        frequency: '',
+        isStopped: false,
+        stopYear: '',
+        stopMonth: '',
+      });
+    }
+  }, []);
 
   // Get current year and generate year options (from 1990 to current year)
   const currentYear = new Date().getFullYear();
@@ -30,37 +61,45 @@ export default function MedicationHistory() {
     { label: '每半年', value: '每半年' },
   ];
 
-  // Grouped medications for display
-  const medicationGroups = [
+  // Update medicationGroups with proper typing
+  const medicationGroups: MedicationGroup[] = [
     {
       title: '雙磷酸鹽類藥物',
       medications: [
-        { name: '福善美保骨錠Fosamax Plus', route: '口服' },
-        { name: '瑞谷卓膜衣錠Reosteo', route: '口服' },
-        { name: '骨維壯注射劑Boniva', route: '注射' },
+        { name: 'Alendronate (Fosamax)', route: '口服' },
+        { name: 'Risedronate (Actonel)', route: '口服' },
+        { name: 'Ibandronate (Boniva)', route: '注射' },
       ]
     },
     {
       title: '單株抗體藥物',
       medications: [
-        { name: '保骼麗注射液Prolia', route: '注射' },
+        { name: 'Denosumab (Prolia/Xgeva)', route: '注射' },
       ]
     },
     {
       title: '其他骨質疏鬆藥物',
       medications: [
-        { name: '鈣穩膜衣錠Evista', route: '口服' },
-        { name: '骨穩Forteo', route: '注射' },
-        { name: '益穩挺Evenity', route: '注射' },
+        { name: 'Bevacizumab (Avastin)', route: '注射' },
+        { name: 'Sunitinib (Sutent)', route: '口服' },
+        { name: 'Cabozantinib (Cabometyx)', route: '口服' },
       ]
     }
   ];
 
-  const handleDrugSelection = (drugName: string, route: string) => {
+  const handleDrugSelection = (drugName: DrugName, route: '口服' | '注射') => {
     updatePatientInfo({
       drugName,
       administrationRoute: route
     });
+  };
+
+  const handleReasonSelection = (reason: '骨質疏鬆' | '多發性骨髓瘤' | '骨轉移' | '其他') => {
+    updatePatientInfo({ indication: reason });
+  };
+
+  const handleFrequencySelection = (freq: '每天' | '每個月' | '每半年') => {
+    updatePatientInfo({ frequency: freq });
   };
 
   // Add validation function
@@ -119,40 +158,23 @@ export default function MedicationHistory() {
           <View style={styles.inputGroup}>
             <Text style={styles.label}>是否正在使用或曾經使用骨質疏鬆相關藥物？</Text>
             <View style={styles.radioGroup}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[
                   styles.radioButton,
                   patientData.hasAntiresorptiveMed && styles.radioButtonSelected
                 ]}
                 onPress={() => updatePatientInfo({ hasAntiresorptiveMed: true })}
               >
-                <Text style={[
-                  styles.radioText,
-                  patientData.hasAntiresorptiveMed && styles.radioTextSelected
-                ]}>是</Text>
+                <Text style={styles.radioText}>是</Text>
               </TouchableOpacity>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={[
                   styles.radioButton,
-                  patientData.hasAntiresorptiveMed === false && styles.radioButtonSelected
+                  !patientData.hasAntiresorptiveMed && styles.radioButtonSelected
                 ]}
-                onPress={() => updatePatientInfo({ 
-                  hasAntiresorptiveMed: false,
-                  drugName: '',
-                  administrationRoute: '',
-                  indication: '',
-                  dosage: '',
-                  frequency: '',
-                  duration: '',
-                  lastDoseDate: '',
-                  hasDrugHoliday: false,
-                  drugHolidayStartDate: '',
-                })}
+                onPress={() => updatePatientInfo({ hasAntiresorptiveMed: false })}
               >
-                <Text style={[
-                  styles.radioText,
-                  patientData.hasAntiresorptiveMed === false && styles.radioTextSelected
-                ]}>否</Text>
+                <Text style={styles.radioText}>否</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -203,7 +225,7 @@ export default function MedicationHistory() {
                             styles.reasonButton,
                             patientData.indication === reason && styles.reasonButtonSelected
                           ]}
-                          onPress={() => updatePatientInfo({ indication: reason })}
+                          onPress={() => handleReasonSelection(reason as '骨質疏鬆' | '多發性骨髓瘤' | '骨轉移' | '其他')}
                         >
                           <Text style={[
                             styles.reasonText,
@@ -254,7 +276,7 @@ export default function MedicationHistory() {
                             styles.radioButton,
                             patientData.frequency === option.value && styles.radioButtonSelected
                           ]}
-                          onPress={() => updatePatientInfo({ frequency: option.value })}
+                          onPress={() => handleFrequencySelection(option.value as '每天' | '每個月' | '每半年')}
                         >
                           <Text style={[
                             styles.radioText,
