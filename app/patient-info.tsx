@@ -1,18 +1,42 @@
-import { View, Text, StyleSheet, TextInput, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TextInput, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useState } from 'react';
 import { router } from 'expo-router';
 import RNPickerSelect from 'react-native-picker-select';
+
+interface PatientInfo {
+  name: string;
+  birthYear: string;
+  birthMonth: string;
+  birthDay: string;
+  idNumber: string;
+  height: string;  // in cm
+  weight: string;  // in kg
+}
+
+// Generate height options (140cm to 200cm)
+const heightOptions = Array.from(
+  { length: 61 },
+  (_, i) => ({ label: `${140 + i} 公分`, value: (140 + i).toString() })
+);
+
+// Generate weight options (30kg to 150kg)
+const weightOptions = Array.from(
+  { length: 121 },
+  (_, i) => ({ label: `${30 + i} 公斤`, value: (30 + i).toString() })
+);
 
 export default function PatientInfo() {
   // Get current year
   const currentYear = new Date().getFullYear();
   
-  const [patientInfo, setPatientInfo] = useState({
+  const [patientInfo, setPatientInfo] = useState<PatientInfo>({
     name: '',
     birthYear: currentYear.toString(),
     birthMonth: '1',
     birthDay: '1',
     idNumber: '',
+    height: '',
+    weight: '',
   });
 
   // Generate year options from 1912 to current year
@@ -31,6 +55,8 @@ export default function PatientInfo() {
   const [showYearPicker, setShowYearPicker] = useState(false);
   const [showMonthPicker, setShowMonthPicker] = useState(false);
   const [showDayPicker, setShowDayPicker] = useState(false);
+  const [showHeightPicker, setShowHeightPicker] = useState(false);
+  const [showWeightPicker, setShowWeightPicker] = useState(false);
 
   // Add a function to get days in month
   const getDaysInMonth = (year: string, month: string) => {
@@ -43,8 +69,33 @@ export default function PatientInfo() {
     (_, i) => ({ label: `${i + 1}日`, value: (i + 1).toString() })
   );
 
+  // Calculate BMI
+  const calculateBMI = (): number | null => {
+    if (!patientInfo.height || !patientInfo.weight) return null;
+    
+    const heightInMeters = parseFloat(patientInfo.height) / 100;
+    const weightInKg = parseFloat(patientInfo.weight);
+    
+    if (heightInMeters <= 0 || weightInKg <= 0) return null;
+    
+    return weightInKg / (heightInMeters * heightInMeters);
+  };
+
+  const bmi = calculateBMI();
+  const isObese = bmi ? bmi >= 30 : false;  // WHO definition of obesity
+
   const handleSubmit = () => {
-    // TODO: Validate inputs
+    if (!patientInfo.height || !patientInfo.weight) {
+      Alert.alert('請輸入身高體重');
+      return;
+    }
+    
+    const bmi = calculateBMI();
+    if (bmi === null) {
+      Alert.alert('身高體重數值有誤');
+      return;
+    }
+
     router.push('/medical-history');
   };
 
@@ -131,6 +182,61 @@ export default function PatientInfo() {
           )}
 
           <View style={styles.inputGroup}>
+            <Text style={styles.label}>身高</Text>
+            <TouchableOpacity 
+              style={styles.pickerContainer}
+              onPress={() => setShowHeightPicker(true)}
+            >
+              <Text style={styles.pickerText}>
+                {patientInfo.height ? `${patientInfo.height} 公分` : '請選擇身高'}
+              </Text>
+            </TouchableOpacity>
+            {showHeightPicker && (
+              <RNPickerSelect
+                value={patientInfo.height}
+                onValueChange={(value) => {
+                  setPatientInfo({ ...patientInfo, height: value });
+                  setShowHeightPicker(false);
+                }}
+                items={heightOptions}
+                style={pickerSelectStyles}
+              />
+            )}
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>體重</Text>
+            <TouchableOpacity 
+              style={styles.pickerContainer}
+              onPress={() => setShowWeightPicker(true)}
+            >
+              <Text style={styles.pickerText}>
+                {patientInfo.weight ? `${patientInfo.weight} 公斤` : '請選擇體重'}
+              </Text>
+            </TouchableOpacity>
+            {showWeightPicker && (
+              <RNPickerSelect
+                value={patientInfo.weight}
+                onValueChange={(value) => {
+                  setPatientInfo({ ...patientInfo, weight: value });
+                  setShowWeightPicker(false);
+                }}
+                items={weightOptions}
+                style={pickerSelectStyles}
+              />
+            )}
+          </View>
+
+          {bmi && (
+            <View style={styles.bmiContainer}>
+              <Text style={styles.bmiText}>
+                BMI: {bmi.toFixed(1)}
+                {isObese && ' (肥胖)'}
+              </Text>
+            </View>
+          )}
+
+          <View style={styles.inputGroup}>
             <Text style={styles.label}>身份證字號</Text>
             <TextInput
               style={styles.input}
@@ -202,13 +308,24 @@ const styles = StyleSheet.create({
   },
   pickerContainer: {
     backgroundColor: '#f8f8f8',
+    padding: 15,
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#ddd',
   },
   pickerText: {
     fontSize: 16,
-    padding: 12,
+    color: '#333',
+  },
+  bmiContainer: {
+    backgroundColor: '#f0f0f0',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  bmiText: {
+    fontSize: 16,
+    textAlign: 'center',
     color: '#333',
   },
 });

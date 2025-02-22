@@ -10,6 +10,11 @@ const generateHTML = (patientData: PatientData) => {
   const riskAssessments = assessRisk(patientData);
   const today = new Date().toLocaleDateString('zh-TW');
   
+  // Calculate BMI
+  const heightInMeters = parseFloat(patientData.height) / 100;
+  const weightInKg = parseFloat(patientData.weight);
+  const bmi = weightInKg / (heightInMeters * heightInMeters);
+  
   return `
     <html>
       <head>
@@ -27,16 +32,29 @@ const generateHTML = (patientData: PatientData) => {
           .risk-high { color: #FF3B30; }
           .risk-medium { color: #FF9500; }
           .risk-low { color: #34C759; }
+          .physical-info {
+            background-color: #f8f8f8;
+            padding: 10px;
+            border-radius: 5px;
+          }
         </style>
       </head>
       <body>
         <h1>MRONJ風險評估報告</h1>
+        
         <div class="section">
           <h2>基本資料</h2>
           <p>姓名: ${patientData.name}</p>
           <p>生日: ${patientData.birthYear}年${patientData.birthMonth}月${patientData.birthDay}日</p>
           <p>身分證字號: ${patientData.idNumber}</p>
           <p>評估日期: ${today}</p>
+          
+          <div class="physical-info">
+            <h3>身體資訊</h3>
+            <p>身高: ${patientData.height} 公分</p>
+            <p>體重: ${patientData.weight} 公斤</p>
+            <p>BMI: ${bmi.toFixed(1)} ${bmi >= 30 ? '(肥胖)' : ''}</p>
+          </div>
         </div>
 
         <div class="section">

@@ -2,36 +2,25 @@ import { create } from 'zustand';
 
 // Add these types for medication categorization
 type MedicationType = 
-  | 'Antiresorptive'  // 抗骨質再吸收劑
-  | 'Antiangiogenic'  // 抗血管新生劑
-  | 'Both'            // 兩者皆是
+  | '抗骨質再吸收劑'
+  | '促骨質合成藥物'
+  | '抗骨質再吸收劑與促骨質合成藥物'
   | '';
 
 type SubType = 
-  | 'Bisphosphonates-IV'     // 靜脈注射型雙磷酸鹽類
-  | 'Bisphosphonates-Oral'   // 口服型雙磷酸鹽類
-  | 'RANK-L Inhibitors'      // RANK-L抑制劑
-  | 'Antiangiogenic Agents'  // 抗血管新生藥物
+  | '雙磷酸鹽類'
+  | '單株抗體'
+  | '選擇性雌激素受體調節物'
   | '';
 
 type DrugName = 
-  // Bisphosphonates - IV
-  | 'Zoledronate (Zometa)'
-  | 'Pamidronate (Aredia)'
-  | 'Ibandronate (Boniva IV)'
-  
-  // Bisphosphonates - Oral
-  | 'Alendronate (Fosamax)'
-  | 'Risedronate (Actonel)'
-  | 'Ibandronate (Boniva)'
-  
-  // RANK-L Inhibitors
-  | 'Denosumab (Prolia/Xgeva)'
-  
-  // Antiangiogenic
-  | 'Bevacizumab (Avastin)'
-  | 'Sunitinib (Sutent)'
-  | 'Cabozantinib (Cabometyx)'
+  | '福善美保骨錠Fosamax Plus'
+  | '瑞谷卓膜衣錠Reosteo'
+  | '骨維壯注射劑Boniva'
+  | '保骼麗注射液Prolia'
+  | '鈣穩膜衣錠Evista'
+  | '骨穩Forteo'
+  | '益穩挺Evenity'
   | '';
 
 export interface PatientData {
@@ -67,12 +56,6 @@ export interface PatientData {
   isStopped: boolean;
   stopYear: string;
   stopMonth: string;
-
-  // Physical measurements
-  height: string;  // in cm
-  weight: string;  // in kg
-  bmi: number | null;
-  isObese: boolean;
 }
 
 interface PatientStore {
@@ -109,10 +92,6 @@ const initialState: PatientData = {
   isStopped: false,
   stopYear: '',
   stopMonth: '',
-  height: '',
-  weight: '',
-  bmi: null,
-  isObese: false,
 };
 
 export const usePatientStore = create<PatientStore>((set: any) => ({
