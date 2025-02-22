@@ -1,20 +1,20 @@
 import { create } from 'zustand';
 
 // Add these types for medication categorization
-type MedicationType = 
+export type MedicationType = 
   | 'Antiresorptive'  // 抗骨質再吸收劑
   | 'Antiangiogenic'  // 抗血管新生劑
   | 'Both'            // 兩者皆是
   | '';
 
-type SubType = 
+export type SubType = 
   | 'Bisphosphonates-IV'     // 靜脈注射型雙磷酸鹽類
   | 'Bisphosphonates-Oral'   // 口服型雙磷酸鹽類
   | 'RANK-L Inhibitors'      // RANK-L抑制劑
   | 'Antiangiogenic Agents'  // 抗血管新生藥物
   | '';
 
-type DrugName = 
+export type DrugName = 
   // Bisphosphonates - IV
   | 'Zoledronate (Zometa)'
   | 'Pamidronate (Aredia)'
