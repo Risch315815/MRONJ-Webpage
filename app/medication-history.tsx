@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { router } from 'expo-router';
 import RNPickerSelect from 'react-native-picker-select';
 import { usePatientStore, DrugName } from './store/patientData';
@@ -145,6 +145,70 @@ export default function MedicationHistory() {
       }
     } else {
       updatePatientInfo({ stopMonth: value });
+    }
+  };
+
+  const validateMedicationFields = () => {
+    if (patientData.hasAntiresorptiveMed) {
+      const errors = [];
+      
+      // Check medication selection
+      if (!patientData.drugName) {
+        errors.push('請選擇使用的藥物');
+      }
+
+      if (patientData.drugName) {
+        // Only check these if a medication is selected
+        if (!patientData.indication) {
+          errors.push('請選擇使用原因');
+        }
+
+        if (!patientData.startYear || !patientData.startMonth) {
+          errors.push(`請選擇開始${patientData.administrationRoute === '口服' ? '吃藥' : '注射'}的時間`);
+        }
+
+        if (!patientData.frequency) {
+          errors.push(`請選擇${patientData.administrationRoute === '口服' ? '吃藥' : '注射'}頻率`);
+        }
+
+        // Check medication status
+        if (patientData.isStopped) {
+          if (!patientData.stopYear || !patientData.stopMonth) {
+            errors.push('請選擇停藥時間');
+          } else {
+            // Validate stop date is after start date
+            const startDate = new Date(
+              parseInt(patientData.startYear),
+              parseInt(patientData.startMonth) - 1
+            );
+            const stopDate = new Date(
+              parseInt(patientData.stopYear),
+              parseInt(patientData.stopMonth) - 1
+            );
+
+            if (stopDate < startDate) {
+              errors.push('停藥時間不能早於開始用藥時間');
+            }
+          }
+        }
+      }
+
+      if (errors.length > 0) {
+        Alert.alert(
+          '請完整填寫用藥資訊',
+          errors.join('\n'),
+          [{ text: '確定' }]
+        );
+        return false;
+      }
+    }
+    return true;
+  };
+
+  // Update the submit handler
+  const handleSubmit = () => {
+    if (validateMedicationFields()) {
+      router.push('/pre-assessment');
     }
   };
 
@@ -359,7 +423,7 @@ export default function MedicationHistory() {
 
         <TouchableOpacity 
           style={styles.nextButton} 
-          onPress={() => router.push('/pre-assessment')}
+          onPress={handleSubmit}
         >
           <Text style={styles.buttonText}>送出資料</Text>
         </TouchableOpacity>

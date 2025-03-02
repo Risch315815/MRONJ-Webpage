@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Switch } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Switch, Alert } from 'react-native';
 import { useState } from 'react';
 import { router } from 'expo-router';
 import RNPickerSelect from 'react-native-picker-select';
@@ -38,8 +38,96 @@ export default function MedicalHistory() {
     { label: '10年以上', value: '10年以上' },
   ];
 
+  // Calculate and display age from stored birth date
+  const age = patientData.age ? `${patientData.age}歲` : '未填寫出生日期';
+
+  // Height and weight options
+  const heightOptions = Array.from(
+    { length: 61 },
+    (_, i) => ({ label: `${140 + i}公分`, value: (140 + i).toString() })
+  );
+
+  const weightOptions = Array.from(
+    { length: 121 },
+    (_, i) => ({ label: `${30 + i}公斤`, value: (30 + i).toString() })
+  );
+
+  const validateFields = () => {
+    const errors = [];
+    const details = [];
+    
+    // Basic required fields
+    if (!patientData.height) errors.push('身高');
+    if (!patientData.weight) errors.push('體重');
+    if (!patientData.gender) errors.push('性別');
+    if (!patientData.systemicDiseases || patientData.systemicDiseases.length === 0) {
+      errors.push('系統性疾病');
+    }
+
+    // Transgender specific validations
+    if (patientData.gender === '跨性別') {
+      if (!patientData.transgenderType) {
+        errors.push('跨性別類型');
+      }
+      if (patientData.hasHormoneTherapy === undefined) {
+        errors.push('是否進行荷爾蒙療法');
+      }
+      if (patientData.hasHormoneTherapy && !patientData.hormoneTherapyDuration) {
+        errors.push('荷爾蒙療法時間長度');
+      }
+    }
+
+    // Radiation therapy details validation
+    if (patientData.hasRadiotherapy) {
+      if (!patientData.radiotherapyDetails?.trim()) {
+        details.push('頭頸部放射線治療詳情');
+      }
+    }
+
+    // Cancer history details validation
+    if (patientData.hasCancer) {
+      if (!patientData.cancerHistory?.trim()) {
+        details.push('惡性腫瘤病史詳情');
+      }
+    }
+
+    // Show error for required fields
+    if (errors.length > 0) {
+      Alert.alert(
+        '請填寫必填項目',
+        `以下欄位尚未填寫完整：\n${errors.join('、')}`,
+        [{ text: '確定' }]
+      );
+      return false;
+    }
+
+    // Show error for missing details
+    if (details.length > 0) {
+      Alert.alert(
+        '請填寫詳細資料',
+        `以下項目需要填寫詳情：\n${details.join('、')}`,
+        [{ text: '確定' }]
+      );
+      return false;
+    }
+    
+    return true;
+  };
+
   const handleSubmit = () => {
-    // TODO: Validate inputs
+    if (!validateFields()) return;
+    
+    const height = parseFloat(patientData.height);
+    const weight = parseFloat(patientData.weight);
+    const heightInMeters = height / 100;
+    const bmi = weight / (heightInMeters * heightInMeters);
+    const isObese = bmi >= 30;
+    
+    updatePatientInfo({
+      bmi: bmi,
+      isObese: isObese,
+    });
+
     router.push('/medication-history');
   };
 
@@ -91,6 +179,40 @@ export default function MedicalHistory() {
         <Text style={styles.title}>病史資料</Text>
 
         <View style={styles.form}>
+          {/* Age Display */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>年齡</Text>
+            <View style={styles.ageDisplay}>
+              <Text style={styles.ageText}>{age}</Text>
+            </View>
+          </View>
+
+          {/* Height Input */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>身高</Text>
+            <View style={styles.heightPickerContainer}>
+              <RNPickerSelect
+                value={patientData.height}
+                onValueChange={(value) => updatePatientInfo({ height: value })}
+                items={heightOptions}
+                placeholder={{ label: '請選擇身高', value: null }}
+              />
+            </View>
+          </View>
+
+          {/* Weight Input */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>體重</Text>
+            <View style={styles.weightPickerContainer}>
+              <RNPickerSelect
+                value={patientData.weight}
+                onValueChange={(value) => updatePatientInfo({ weight: value })}
+                items={weightOptions}
+                placeholder={{ label: '請選擇體重', value: null }}
+              />
+            </View>
+          </View>
+
           {/* Gender Selection */}
           <View style={styles.inputGroup}>
             <Text style={styles.label}>生理性別</Text>
@@ -327,7 +449,24 @@ export default function MedicalHistory() {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.nextButton} onPress={handleSubmit}>
+        <TouchableOpacity 
+          style={styles.nextButton} 
+          onPress={() => {
+            if (validateFields()) {
+              // Calculate BMI when proceeding
+              if (patientData.height && patientData.weight) {
+                const height = parseFloat(patientData.height) / 100;
+                const weight = parseFloat(patientData.weight);
+                const bmi = weight / (height * height);
+                updatePatientInfo({
+                  bmi: Math.round(bmi * 10) / 10,
+                  isObese: bmi >= 30
+                });
+              }
+              router.push('/medication-history');
+            }
+          }}
+        >
           <Text style={styles.buttonText}>下一步</Text>
         </TouchableOpacity>
       </View>
@@ -455,6 +594,29 @@ const styles = StyleSheet.create({
   },
   radioTextSelected: {
     color: 'white',
+  },
+  ageDisplay: {
+    backgroundColor: '#f8f8f8',
+    padding: 15,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  ageText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  heightPickerContainer: {
+    backgroundColor: '#f8f8f8',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  weightPickerContainer: {
+    backgroundColor: '#f8f8f8',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
 });
 

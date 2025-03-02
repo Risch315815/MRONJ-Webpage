@@ -10,8 +10,6 @@ interface PatientInfo {
   birthMonth: string;
   birthDay: string;
   idNumber: string;
-  height: string;  // in cm
-  weight: string;  // in kg
   age: number | null;
 }
 
@@ -43,8 +41,6 @@ const calculateAge = (year: string, month: string, day: string): number => {
 
 export default function PatientInfo() {
   const { updatePatientInfo } = usePatientStore();
-  
-  // Get current year
   const currentYear = new Date().getFullYear();
   
   const [patientInfo, setPatientInfo] = useState<PatientInfo>({
@@ -53,8 +49,6 @@ export default function PatientInfo() {
     birthMonth: '1',
     birthDay: '1',
     idNumber: '',
-    height: '',
-    weight: '',
     age: null,
   });
 
@@ -62,57 +56,50 @@ export default function PatientInfo() {
   const yearOptions = Array.from(
     { length: currentYear - 1911 },
     (_, i) => ({ label: `${1912 + i}年`, value: (1912 + i).toString() })
-  ).reverse(); // Reverse to show newest years first
+  ).reverse();
 
-  // Generate month options
   const monthOptions = Array.from(
     { length: 12 },
     (_, i) => ({ label: `${i + 1}月`, value: (i + 1).toString() })
   );
 
-  // Add these state variables for controlling pickers
-  const [showYearPicker, setShowYearPicker] = useState(false);
-  const [showMonthPicker, setShowMonthPicker] = useState(false);
-  const [showDayPicker, setShowDayPicker] = useState(false);
-  const [showHeightPicker, setShowHeightPicker] = useState(false);
-  const [showWeightPicker, setShowWeightPicker] = useState(false);
-
-  // Add a function to get days in month
   const getDaysInMonth = (year: string, month: string) => {
     return new Date(parseInt(year), parseInt(month), 0).getDate();
   };
 
-  // Update the dayOptions to be dynamic based on selected year and month
   const dayOptions = Array.from(
     { length: getDaysInMonth(patientInfo.birthYear, patientInfo.birthMonth) },
     (_, i) => ({ label: `${i + 1}日`, value: (i + 1).toString() })
   );
 
-  // Calculate BMI
-  const calculateBMI = (): number | null => {
-    if (!patientInfo.height || !patientInfo.weight) return null;
-    
-    const heightInMeters = parseFloat(patientInfo.height) / 100;
-    const weightInKg = parseFloat(patientInfo.weight);
-    
-    if (heightInMeters <= 0 || weightInKg <= 0) return null;
-    
-    return weightInKg / (heightInMeters * heightInMeters);
+  // Validate Taiwan ID number format
+  const validateTaiwanID = (id: string) => {
+    const idRegex = /^[A-Z][12]\d{8}$/;
+    return idRegex.test(id);
   };
-
-  const bmi = calculateBMI();
-  const isObese = bmi ? bmi >= 30 : false;  // WHO definition of obesity
 
   const validateFields = () => {
     const errors = [];
     
-    if (!patientInfo.name) errors.push('姓名');
-    if (!patientInfo.idNumber) errors.push('身分證字號');
-    if (!patientInfo.height) errors.push('身高');
-    if (!patientInfo.weight) errors.push('體重');
+    if (!patientInfo.name.trim()) errors.push('姓名');
+    if (!patientInfo.idNumber.trim()) {
+      errors.push('身分證字號');
+    } else if (!validateTaiwanID(patientInfo.idNumber.toUpperCase())) {
+      Alert.alert('錯誤', '請輸入有效的身分證字號');
+      return false;
+    }
+    
+    // Validate birth date
+    if (!patientInfo.birthYear || !patientInfo.birthMonth || !patientInfo.birthDay) {
+      errors.push('出生日期');
+    }
     
     if (errors.length > 0) {
-      Alert.alert('請填寫以下必填項目', errors.join('、'));
+      Alert.alert(
+        '請填寫必填項目',
+        `以下欄位尚未填寫完整：\n${errors.join('、')}`,
+        [{ text: '確定' }]
+      );
       return false;
     }
     
@@ -121,18 +108,6 @@ export default function PatientInfo() {
 
   const handleSubmit = () => {
     if (!validateFields()) return;
-    
-    const height = parseFloat(patientInfo.height);
-    const weight = parseFloat(patientInfo.weight);
-    
-    if (!height || !weight) {
-      Alert.alert('請輸入身高體重');
-      return;
-    }
-    
-    const heightInMeters = height / 100;
-    const bmi = weight / (heightInMeters * heightInMeters);
-    const isObese = bmi >= 30;
     
     const age = calculateAge(
       patientInfo.birthYear,
@@ -145,37 +120,17 @@ export default function PatientInfo() {
       birthYear: patientInfo.birthYear,
       birthMonth: patientInfo.birthMonth,
       birthDay: patientInfo.birthDay,
-      idNumber: patientInfo.idNumber,
+      idNumber: patientInfo.idNumber.toUpperCase(),
       age: age,
-      height: patientInfo.height,
-      weight: patientInfo.weight,
-      bmi: bmi,
-      isObese: isObese,
     });
 
     router.push('/medical-history');
   };
 
-  // Update the birth date handlers
-  const handleBirthYearChange = (value: string) => {
-    const age = calculateAge(value, patientInfo.birthMonth, patientInfo.birthDay);
-    setPatientInfo({ ...patientInfo, birthYear: value, age });
-  };
-
-  const handleBirthMonthChange = (value: string) => {
-    const age = calculateAge(patientInfo.birthYear, value, patientInfo.birthDay);
-    setPatientInfo({ ...patientInfo, birthMonth: value, age });
-  };
-
-  const handleBirthDayChange = (value: string) => {
-    const age = calculateAge(patientInfo.birthYear, patientInfo.birthMonth, value);
-    setPatientInfo({ ...patientInfo, birthDay: value, age });
-  };
-
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.title}>個人資料</Text>
+        <Text style={styles.title}>身分驗證</Text>
 
         <View style={styles.form}>
           <View style={styles.inputGroup}>
@@ -184,131 +139,55 @@ export default function PatientInfo() {
               style={styles.input}
               value={patientInfo.name}
               onChangeText={(text) => setPatientInfo({ ...patientInfo, name: text })}
-              placeholder="請輸入身分證上的姓名"
+              placeholder="請輸入姓名"
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>身分證字號</Text>
+            <TextInput
+              style={styles.input}
+              value={patientInfo.idNumber}
+              onChangeText={(text) => setPatientInfo({ ...patientInfo, idNumber: text.toUpperCase() })}
+              placeholder="請輸入身分證字號"
+              autoCapitalize="characters"
+              maxLength={10}
             />
           </View>
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>出生日期</Text>
-            <View style={styles.datePickerGroup}>
-              <TouchableOpacity 
-                style={[styles.pickerContainer, { flex: 2 }]}
-                onPress={() => setShowYearPicker(true)}
-              >
-                <Text style={styles.pickerText}>
-                  {patientInfo.birthYear}年
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={[styles.pickerContainer, { flex: 1 }]}
-                onPress={() => setShowMonthPicker(true)}
-              >
-                <Text style={styles.pickerText}>
-                  {patientInfo.birthMonth}月
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={[styles.pickerContainer, { flex: 1 }]}
-                onPress={() => setShowDayPicker(true)}
-              >
-                <Text style={styles.pickerText}>
-                  {patientInfo.birthDay}日
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {showYearPicker && (
-            <RNPickerSelect
-              value={patientInfo.birthYear}
-              onValueChange={handleBirthYearChange}
-              items={yearOptions}
-              style={pickerSelectStyles}
-            />
-          )}
-
-          {showMonthPicker && (
-            <RNPickerSelect
-              value={patientInfo.birthMonth}
-              onValueChange={handleBirthMonthChange}
-              items={monthOptions}
-              style={pickerSelectStyles}
-            />
-          )}
-
-          {showDayPicker && (
-            <RNPickerSelect
-              value={patientInfo.birthDay}
-              onValueChange={handleBirthDayChange}
-              items={dayOptions}
-              style={pickerSelectStyles}
-            />
-          )}
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>身高</Text>
-            <TouchableOpacity 
-              style={styles.pickerContainer}
-              onPress={() => setShowHeightPicker(true)}
-            >
-              <Text style={styles.pickerText}>
-                {patientInfo.height ? `${patientInfo.height} 公分` : '請選擇身高'}
-              </Text>
-            </TouchableOpacity>
-            {showHeightPicker && (
+            
+            {/* Year picker on first row */}
+            <View style={styles.yearPickerContainer}>
               <RNPickerSelect
-                value={patientInfo.height}
-                onValueChange={(value) => {
-                  setPatientInfo({ ...patientInfo, height: value });
-                  setShowHeightPicker(false);
-                }}
-                items={heightOptions}
-                style={pickerSelectStyles}
+                value={patientInfo.birthYear}
+                onValueChange={(value) => setPatientInfo({ ...patientInfo, birthYear: value })}
+                items={yearOptions}
+                placeholder={{ label: '年', value: null }}
               />
-            )}
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>體重</Text>
-            <TouchableOpacity 
-              style={styles.pickerContainer}
-              onPress={() => setShowWeightPicker(true)}
-            >
-              <Text style={styles.pickerText}>
-                {patientInfo.weight ? `${patientInfo.weight} 公斤` : '請選擇體重'}
-              </Text>
-            </TouchableOpacity>
-            {showWeightPicker && (
-              <RNPickerSelect
-                value={patientInfo.weight}
-                onValueChange={(value) => {
-                  setPatientInfo({ ...patientInfo, weight: value });
-                  setShowWeightPicker(false);
-                }}
-                items={weightOptions}
-                style={pickerSelectStyles}
-              />
-            )}
-          </View>
-
-          {bmi && (
-            <View style={styles.bmiContainer}>
-              <Text style={styles.bmiText}>
-                BMI: {bmi.toFixed(1)}
-                {isObese && ' (肥胖)'}
-              </Text>
             </View>
-          )}
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>身份證字號</Text>
-            <TextInput
-              style={styles.input}
-              value={patientInfo.idNumber}
-              onChangeText={(text) => setPatientInfo({ ...patientInfo, idNumber: text })}
-              placeholder="請輸入身份證字號"
-              autoCapitalize="characters"
-            />
+            {/* Month and Day pickers on second row */}
+            <View style={styles.monthDayContainer}>
+              <View style={[styles.datePickerItem, { flex: 1 }]}>
+                <RNPickerSelect
+                  value={patientInfo.birthMonth}
+                  onValueChange={(value) => setPatientInfo({ ...patientInfo, birthMonth: value })}
+                  items={monthOptions}
+                  placeholder={{ label: '月', value: null }}
+                />
+              </View>
+
+              <View style={[styles.datePickerItem, { flex: 1 }]}>
+                <RNPickerSelect
+                  value={patientInfo.birthDay}
+                  onValueChange={(value) => setPatientInfo({ ...patientInfo, birthDay: value })}
+                  items={dayOptions}
+                  placeholder={{ label: '日', value: null }}
+                />
+              </View>
+            </View>
           </View>
         </View>
 
@@ -366,20 +245,27 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
   },
-  datePickerGroup: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  pickerContainer: {
+  yearPickerContainer: {
     backgroundColor: '#f8f8f8',
-    padding: 15,
-    borderRadius: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginBottom: 10,  // Add space between year and month/day pickers
+  },
+  monthDayContainer: {
+    flexDirection: 'row',
+    gap: 15,
+  },
+  datePickerItem: {
+    backgroundColor: '#f8f8f8',
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: '#ddd',
   },
-  pickerText: {
+  unitText: {
     fontSize: 16,
     color: '#333',
+    marginLeft: 4,
   },
   bmiContainer: {
     backgroundColor: '#f0f0f0',
@@ -390,21 +276,6 @@ const styles = StyleSheet.create({
   bmiText: {
     fontSize: 16,
     textAlign: 'center',
-    color: '#333',
-  },
-});
-
-const pickerSelectStyles = StyleSheet.create({
-  inputIOS: {
-    fontSize: 16,
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-    color: '#333',
-  },
-  inputAndroid: {
-    fontSize: 16,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
     color: '#333',
   },
 }); 

@@ -33,47 +33,12 @@
       "permissions": [
         "WRITE_EXTERNAL_STORAGE",
         "READ_EXTERNAL_STORAGE"
-      ]
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
+      ],
+      "proguard-rules": "./proguard-rules.pro"
     },
     "plugins": [
       "expo-router"
     ],
-    "scheme": "mronj-app",
-    "newArchEnabled": true,
-    "experiments": {
-      "typedRoutes": true,
-      "tsconfigPaths": true
-    },
-    "extra": {
-      "router": {
-        "origin": false
-      },
-      "eas": {
-        "projectId": "2753a1c2-1f7b-42f9-b793-457f5da31302"
-      }
-    }
-  },
-  "cli": {
-    "version": ">= 5.9.1"
-  },
-  "build": {
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal"
-    },
-    "preview": {
-      "distribution": "internal"
-    },
-    "production": {
-      "android": {
-        "buildType": "app-bundle"
-      }
-    }
-  },
-  "submit": {
-    "production": {}
+    "scheme": "mronj-app"
   }
 }
