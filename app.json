@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "MRONJ Risk Assessment",
-    "slug": "mronj-risk-assessment",
+    "name": "MRONJ-Webpage",
+    "slug": "mronj-webpage",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -28,7 +28,7 @@
       "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
+        "backgroundColor": "#ffffff"
       },
       "permissions": [
         "WRITE_EXTERNAL_STORAGE",
@@ -39,6 +39,11 @@
     "plugins": [
       "expo-router"
     ],
-    "scheme": "mronj-app"
+    "scheme": "mronj-app",
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "platforms": ["ios", "android", "web"]
   }
 }
