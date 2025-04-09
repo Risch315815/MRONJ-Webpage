@@ -42,7 +42,7 @@
     "scheme": "mronj-app",
     "web": {
       "favicon": "./assets/favicon.png",
-      "bundler": "metro"
+      "bundler": "webpack"
     },
     "platforms": ["ios", "android", "web"]
   }
