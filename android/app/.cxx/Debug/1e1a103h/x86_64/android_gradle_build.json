@@ -1,0 +1,93 @@
+{
+  "buildFiles": [
+    "D:\\Coding\\React_MRONJ\\MRONJ_alpha\\node_modules\\@react-native-picker\\picker\\android\\src\\main\\jni\\CMakeLists.txt",
+    "D:\\Coding\\React_MRONJ\\MRONJ_alpha\\node_modules\\react-native-gesture-handler\\android\\build\\generated\\source\\codegen\\jni\\CMakeLists.txt",
+    "D:\\Coding\\React_MRONJ\\MRONJ_alpha\\node_modules\\react-native-safe-area-context\\android\\src\\main\\jni\\CMakeLists.txt",
+    "D:\\Coding\\React_MRONJ\\MRONJ_alpha\\node_modules\\react-native-screens\\android\\src\\main\\jni\\CMakeLists.txt",
+    "D:\\Coding\\React_MRONJ\\MRONJ_alpha\\node_modules\\react-native-webview\\android\\build\\generated\\source\\codegen\\jni\\CMakeLists.txt",
+    "D:\\Coding\\React_MRONJ\\MRONJ_alpha\\node_modules\\react-native\\ReactAndroid\\cmake-utils\\default-app-setup\\CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "C:\\Users\\USER\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+      "-C",
+      "D:\\Coding\\React_MRONJ\\MRONJ_alpha\\android\\app\\.cxx\\Debug\\1e1a103h\\x86_64",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "C:\\Users\\USER\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+    "-C",
+    "D:\\Coding\\React_MRONJ\\MRONJ_alpha\\android\\app\\.cxx\\Debug\\1e1a103h\\x86_64",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "appmodules::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "x86_64",
+      "artifactName": "appmodules",
+      "output": "D:\\Coding\\React_MRONJ\\MRONJ_alpha\\android\\app\\build\\intermediates\\cxx\\Debug\\1e1a103h\\obj\\x86_64\\libappmodules.so",
+      "runtimeFiles": [
+        "D:\\Coding\\React_MRONJ\\MRONJ_alpha\\android\\app\\build\\intermediates\\cxx\\Debug\\1e1a103h\\obj\\x86_64\\libreact_codegen_rnpicker.so",
+        "D:\\Coding\\React_MRONJ\\MRONJ_alpha\\android\\app\\build\\intermediates\\cxx\\Debug\\1e1a103h\\obj\\x86_64\\libreact_codegen_safeareacontext.so",
+        "D:\\Coding\\React_MRONJ\\MRONJ_alpha\\android\\app\\build\\intermediates\\cxx\\Debug\\1e1a103h\\obj\\x86_64\\libreact_codegen_rnscreens.so",
+        "C:\\Users\\USER\\.gradle\\caches\\8.10.2\\transforms\\14479106fc9c285034fe5188965917a6\\transformed\\fbjni-0.6.0\\prefab\\modules\\fbjni\\libs\\android.x86_64\\libfbjni.so",
+        "C:\\Users\\USER\\.gradle\\caches\\8.10.2\\transforms\\d1ab2155b539508f564b7247055e2db0\\transformed\\react-android-0.76.7-debug\\prefab\\modules\\jsi\\libs\\android.x86_64\\libjsi.so",
+        "C:\\Users\\USER\\.gradle\\caches\\8.10.2\\transforms\\d1ab2155b539508f564b7247055e2db0\\transformed\\react-android-0.76.7-debug\\prefab\\modules\\reactnative\\libs\\android.x86_64\\libreactnative.so"
+      ]
+    },
+    "react_codegen_RNCWebViewSpec::@eb48929f9f7453740a6c": {
+      "toolchain": "toolchain",
+      "abi": "x86_64",
+      "artifactName": "react_codegen_RNCWebViewSpec"
+    },
+    "react_codegen_rngesturehandler_codegen::@39f233abcd2c728bc6ec": {
+      "toolchain": "toolchain",
+      "abi": "x86_64",
+      "artifactName": "react_codegen_rngesturehandler_codegen"
+    },
+    "react_codegen_rnpicker::@e8bb2e9e833f47d0d516": {
+      "toolchain": "toolchain",
+      "abi": "x86_64",
+      "artifactName": "react_codegen_rnpicker",
+      "output": "D:\\Coding\\React_MRONJ\\MRONJ_alpha\\android\\app\\build\\intermediates\\cxx\\Debug\\1e1a103h\\obj\\x86_64\\libreact_codegen_rnpicker.so",
+      "runtimeFiles": [
+        "C:\\Users\\USER\\.gradle\\caches\\8.10.2\\transforms\\d1ab2155b539508f564b7247055e2db0\\transformed\\react-android-0.76.7-debug\\prefab\\modules\\reactnative\\libs\\android.x86_64\\libreactnative.so",
+        "C:\\Users\\USER\\.gradle\\caches\\8.10.2\\transforms\\d1ab2155b539508f564b7247055e2db0\\transformed\\react-android-0.76.7-debug\\prefab\\modules\\jsi\\libs\\android.x86_64\\libjsi.so",
+        "C:\\Users\\USER\\.gradle\\caches\\8.10.2\\transforms\\14479106fc9c285034fe5188965917a6\\transformed\\fbjni-0.6.0\\prefab\\modules\\fbjni\\libs\\android.x86_64\\libfbjni.so"
+      ]
+    },
+    "react_codegen_rnscreens::@25bcbd507e98d3a854ad": {
+      "toolchain": "toolchain",
+      "abi": "x86_64",
+      "artifactName": "react_codegen_rnscreens",
+      "output": "D:\\Coding\\React_MRONJ\\MRONJ_alpha\\android\\app\\build\\intermediates\\cxx\\Debug\\1e1a103h\\obj\\x86_64\\libreact_codegen_rnscreens.so",
+      "runtimeFiles": [
+        "C:\\Users\\USER\\.gradle\\caches\\8.10.2\\transforms\\d1ab2155b539508f564b7247055e2db0\\transformed\\react-android-0.76.7-debug\\prefab\\modules\\reactnative\\libs\\android.x86_64\\libreactnative.so",
+        "C:\\Users\\USER\\.gradle\\caches\\8.10.2\\transforms\\d1ab2155b539508f564b7247055e2db0\\transformed\\react-android-0.76.7-debug\\prefab\\modules\\jsi\\libs\\android.x86_64\\libjsi.so",
+        "C:\\Users\\USER\\.gradle\\caches\\8.10.2\\transforms\\14479106fc9c285034fe5188965917a6\\transformed\\fbjni-0.6.0\\prefab\\modules\\fbjni\\libs\\android.x86_64\\libfbjni.so"
+      ]
+    },
+    "react_codegen_safeareacontext::@7984cd80db47aa7b952a": {
+      "toolchain": "toolchain",
+      "abi": "x86_64",
+      "artifactName": "react_codegen_safeareacontext",
+      "output": "D:\\Coding\\React_MRONJ\\MRONJ_alpha\\android\\app\\build\\intermediates\\cxx\\Debug\\1e1a103h\\obj\\x86_64\\libreact_codegen_safeareacontext.so",
+      "runtimeFiles": [
+        "C:\\Users\\USER\\.gradle\\caches\\8.10.2\\transforms\\14479106fc9c285034fe5188965917a6\\transformed\\fbjni-0.6.0\\prefab\\modules\\fbjni\\libs\\android.x86_64\\libfbjni.so",
+        "C:\\Users\\USER\\.gradle\\caches\\8.10.2\\transforms\\d1ab2155b539508f564b7247055e2db0\\transformed\\react-android-0.76.7-debug\\prefab\\modules\\jsi\\libs\\android.x86_64\\libjsi.so",
+        "C:\\Users\\USER\\.gradle\\caches\\8.10.2\\transforms\\d1ab2155b539508f564b7247055e2db0\\transformed\\react-android-0.76.7-debug\\prefab\\modules\\reactnative\\libs\\android.x86_64\\libreactnative.so"
+      ]
+    }
+  },
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "C:\\Users\\USER\\AppData\\Local\\Android\\Sdk\\ndk\\26.1.10909125\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang.exe",
+      "cppCompilerExecutable": "C:\\Users\\USER\\AppData\\Local\\Android\\Sdk\\ndk\\26.1.10909125\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}

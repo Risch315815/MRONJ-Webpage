@@ -1,0 +1,42 @@
+{
+  "buildFiles": [
+    "D:\\Coding\\React_MRONJ\\MRONJ_alpha\\node_modules\\react-native\\ReactAndroid\\cmake-utils\\default-app-setup\\CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "C:\\Users\\USER\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+      "-C",
+      "D:\\Coding\\React_MRONJ\\MRONJ_alpha\\android\\app\\.cxx\\Debug\\1e1a103h\\x86",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "C:\\Users\\USER\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+    "-C",
+    "D:\\Coding\\React_MRONJ\\MRONJ_alpha\\android\\app\\.cxx\\Debug\\1e1a103h\\x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "appmodules::@6890427a1f51a3e7e1df": {
+      "toolchain": "toolchain",
+      "abi": "x86",
+      "artifactName": "appmodules",
+      "output": "D:\\Coding\\React_MRONJ\\MRONJ_alpha\\android\\app\\build\\intermediates\\cxx\\Debug\\1e1a103h\\obj\\x86\\libappmodules.so",
+      "runtimeFiles": [
+        "C:\\Users\\USER\\.gradle\\caches\\8.10.2\\transforms\\14479106fc9c285034fe5188965917a6\\transformed\\fbjni-0.6.0\\prefab\\modules\\fbjni\\libs\\android.x86\\libfbjni.so",
+        "C:\\Users\\USER\\.gradle\\caches\\8.10.2\\transforms\\d1ab2155b539508f564b7247055e2db0\\transformed\\react-android-0.76.7-debug\\prefab\\modules\\jsi\\libs\\android.x86\\libjsi.so",
+        "C:\\Users\\USER\\.gradle\\caches\\8.10.2\\transforms\\d1ab2155b539508f564b7247055e2db0\\transformed\\react-android-0.76.7-debug\\prefab\\modules\\reactnative\\libs\\android.x86\\libreactnative.so"
+      ]
+    }
+  },
+  "toolchains": {
+    "toolchain": {
+      "cCompilerExecutable": "C:\\Users\\USER\\AppData\\Local\\Android\\Sdk\\ndk\\26.1.10909125\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang.exe",
+      "cppCompilerExecutable": "C:\\Users\\USER\\AppData\\Local\\Android\\Sdk\\ndk\\26.1.10909125\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe"
+    }
+  },
+  "cFileExtensions": [],
+  "cppFileExtensions": [
+    "cpp"
+  ]
+}
