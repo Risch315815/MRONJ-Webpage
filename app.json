@@ -42,7 +42,18 @@
     "scheme": "mronj-app",
     "web": {
       "favicon": "./assets/favicon.png",
-      "bundler": "webpack"
+      "bundler": "webpack",
+      "output": "static",
+      "build": {
+        "babel": {
+          "include": ["expo-router"]
+        }
+      }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      }
     },
     "platforms": ["ios", "android", "web"]
   }
